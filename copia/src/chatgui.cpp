@@ -45,24 +45,6 @@ ChatBotFrame::ChatBotFrame(const wxString &title) : wxFrame(NULL, wxID_ANY, titl
     vertBoxSizer->Add(_userTextCtrl, 1, wxEXPAND | wxALL, 5);
     ctrlPanel->SetSizer(vertBoxSizer);
 
-    m_pMenuBar = new wxMenuBar();
-    // File Menu
-    m_pFileMenu = new wxMenu();
-    m_pFileMenu->Append(wxID_EXECUTE, _T("&Listen"));
-    m_pFileMenu->Append(wxID_ADD, _T("&Connect"));
-    m_pFileMenu->Append(wxID_EXIT, _T("&Quit "));
-    m_pMenuBar->Append(m_pFileMenu, _T("&File"));
-    // About menu
-    
-    SetMenuBar(m_pMenuBar);
-
-    Connect(wxID_EXECUTE, wxEVT_COMMAND_MENU_SELECTED,
-      wxCommandEventHandler(ChatBotFrame::OnListen));
-    Connect(wxID_ADD, wxEVT_COMMAND_MENU_SELECTED,
-      wxCommandEventHandler(ChatBotFrame::OnConnect));
-    Connect(wxID_EXIT, wxEVT_COMMAND_MENU_SELECTED,
-      wxCommandEventHandler(ChatBotFrame::OnQuit));
-
     // position window in screen center
     this->Centre();
 }
@@ -207,21 +189,4 @@ ChatBotPanelDialogItem::ChatBotPanelDialogItem(wxPanel *parent, wxString text, b
 
     // set background color
     this->SetBackgroundColour((isFromUser == true ? wxT("YELLOW") : wxT("BLUE")));
-}
-void ChatBotFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
-{
-  Close(true);
-}
-void ChatBotFrame::OnListen(wxCommandEvent& WXUNUSED(event))
-{
-  socket=std::make_unique<socketServer>();
-  socket->attachPort();
-  socket->receiving();
-  socket->accepting();
-  char a=socket->reading();
-  socket->printing();
-}
-void ChatBotFrame::OnConnect(wxCommandEvent& WXUNUSED(event))
-{
-  
 }

@@ -13,12 +13,7 @@ socketServer::socketServer()
 {
     opt=1;
     addrlen = sizeof(address); 
-
-    address.sin_family = AF_INET; 
-    address.sin_addr.s_addr = INADDR_ANY; 
-    address.sin_port = htons( PORT ); 
-       
-    //socket descriptor
+     
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) 
     { 
         perror("socket failed"); 
@@ -27,7 +22,15 @@ socketServer::socketServer()
 }
 void socketServer::attachPort()
 {
-    
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))) 
+    { 
+        perror("setsockopt"); 
+        exit(EXIT_FAILURE); 
+    } 
+    address.sin_family = AF_INET; 
+    address.sin_addr.s_addr = INADDR_ANY; 
+    address.sin_port = htons( PORT ); 
+       
     // Forcefully attaching socket to the port 8080 
     if (bind(server_fd, (struct sockaddr *)&address,  
                                  sizeof(address))<0) 
@@ -61,3 +64,13 @@ void socketServer::printing()
 {
     printf("%s\n",buffer ); 
 }
+int main(int argc, char const *argv[]) 
+{ 
+    socketServer socketserver;
+    socketserver.attachPort();
+    socketserver.receiving();
+    socketserver.accepting();
+    char a=socketserver.reading();
+    socketserver.printing();
+    return 0; 
+} 

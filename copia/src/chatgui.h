@@ -3,7 +3,6 @@
 
 #include <wx/wx.h>
 #include<memory>
-#include"socketserver.h"
 
 class ChatLogic; // forward declaration
 
@@ -53,18 +52,12 @@ private:
     // control elements
     ChatBotPanelDialog *_panelDialog;
     wxTextCtrl *_userTextCtrl;
-    wxMenuBar *m_pMenuBar;
-    wxMenu *m_pFileMenu;
-    std::unique_ptr<socketServer> socket;
-    void OnQuit(wxCommandEvent& WXUNUSED(event));
-    void OnConnect(wxCommandEvent& WXUNUSED(event));
-    void OnListen(wxCommandEvent& WXUNUSED(event));
+
     // events
     void OnEnter(wxCommandEvent &WXUNUSED(event));
 
 public:
     // constructor / desctructor
-    
     ChatBotFrame(const wxString &title);
 };
 
