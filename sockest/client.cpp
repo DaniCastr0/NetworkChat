@@ -1,13 +1,11 @@
 
+
 // Client side C/C++ program to demonstrate Socket programming 
 #include <stdio.h> 
 #include <sys/socket.h> 
 #include <arpa/inet.h> 
 #include <unistd.h> 
 #include <string.h> 
-#include<iostream>
-
-using namespace std;
 #define PORT 8080 
    
 int main(int argc, char const *argv[]) 
@@ -38,8 +36,9 @@ int main(int argc, char const *argv[])
         return -1; 
     } 
     send(sock , hello , strlen(hello) , 0 ); 
-    cout<<"Hello message sent"<<endl; 
-    valread = read( sock , buffer, 1024); 
-    cout<<buffer<<endl; 
+    printf("Hello message sent\n"); 
+    //valread = read( sock , buffer, 1024); 
+    //printf("%s\n",buffer ); 
     return 0; 
 } 
+

@@ -61,6 +61,7 @@ private:
     void OnListen(wxCommandEvent& WXUNUSED(event));
     // events
     void OnEnter(wxCommandEvent &WXUNUSED(event));
+    void startServer();
 
 public:
     // constructor / desctructor

@@ -7,6 +7,10 @@
 #include "socketserver.h" 
 #include <string> 
 #include<iostream>
+#include<memory>
+
+using namespace std;
+
 #define PORT 8080 
 
 socketServer::socketServer()
@@ -52,12 +56,22 @@ void socketServer::accepting()
         exit(EXIT_FAILURE); 
     } 
 }
-char socketServer::reading()
+char *socketServer::reading()
 {
     valread = read( new_socket , buffer, 1024); 
-    return valread;
+    return buffer;
 }
 void socketServer::printing()
 {
     printf("%s\n",buffer ); 
 }
+// int main()
+// {
+//     socketServer socket;
+//     socket.attachPort();
+//     socket.receiving();
+//     socket.accepting();
+//     char *a=socket.reading();
+//     //wxString botText(a, wxConvUTF8);
+//     cout<<a<<endl;
+// }

@@ -2,6 +2,9 @@
 #include <wx/colour.h>
 #include <wx/image.h>
 #include <string>
+#include<iostream>
+
+using namespace std;
 
 #include "chatgui.h"
 
@@ -27,6 +30,7 @@ bool ChatBotApp::OnInit()
 // wxWidgets FRAME
 ChatBotFrame::ChatBotFrame(const wxString &title) : wxFrame(NULL, wxID_ANY, title, wxDefaultPosition, wxSize(width, height))
 {
+    
     // create panel with background image
     ChatBotFrameImagePanel *ctrlPanel = new ChatBotFrameImagePanel(this);
 
@@ -140,7 +144,15 @@ void ChatBotPanelDialog::AddDialogItem(wxString text, bool isFromUser)
 {
     // add a single dialog element to the sizer
     ChatBotPanelDialogItem *item = new ChatBotPanelDialogItem(this, text, isFromUser);
-    _dialogSizer->Add(item, 0, wxALL | (isFromUser == true ? wxALIGN_LEFT : wxALIGN_RIGHT), 8);
+    if (isFromUser==true)
+    {
+        _dialogSizer->Add(item, 0, wxALL | wxALIGN_LEFT , 8);
+    }
+    else
+    {
+       _dialogSizer->Add(item, 0, wxALL | wxALIGN_RIGHT, 8);
+    }
+    
     _dialogSizer->Layout();
 
     // make scrollbar show up
@@ -192,7 +204,7 @@ ChatBotPanelDialogItem::ChatBotPanelDialogItem(wxPanel *parent, wxString text, b
     wxBitmap *bitmap = nullptr; 
 
     // create image and text
-    _chatBotImg = new wxStaticBitmap(this, wxID_ANY, (isFromUser ? wxBitmap(imgBasePath + "user.png", wxBITMAP_TYPE_PNG) : *bitmap), wxPoint(-1, -1), wxSize(-1, -1));
+    _chatBotImg = new wxStaticBitmap(this, wxID_ANY, (isFromUser ? wxBitmap(imgBasePath + "user.png", wxBITMAP_TYPE_PNG) : wxBitmap(imgBasePath + "user.png", wxBITMAP_TYPE_PNG)), wxPoint(-1, -1), wxSize(-1, -1));
     _chatBotTxt = new wxStaticText(this, wxID_ANY, text, wxPoint(-1, -1), wxSize(150, -1), wxALIGN_CENTRE | wxBORDER_NONE);
     _chatBotTxt->SetForegroundColour(isFromUser == true ? wxColor(*wxBLACK) : wxColor(*wxWHITE));
 
@@ -214,14 +226,24 @@ void ChatBotFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 }
 void ChatBotFrame::OnListen(wxCommandEvent& WXUNUSED(event))
 {
-  socket=std::make_unique<socketServer>();
-  socket->attachPort();
-  socket->receiving();
-  socket->accepting();
-  char a=socket->reading();
-  socket->printing();
+  startServer();
+  
 }
+  
+
 void ChatBotFrame::OnConnect(wxCommandEvent& WXUNUSED(event))
 {
   
+}
+void ChatBotFrame::startServer()
+{
+    socket=std::make_unique<socketServer>();
+    socket->attachPort();
+    socket->receiving();
+    socket->accepting();
+    char *a=socket->reading();
+    // //string a="holi";
+     wxString botText(a, wxConvUTF8);
+    // //cout<<a<<endl;
+     _panelDialog->AddDialogItem(botText, false);
 }
