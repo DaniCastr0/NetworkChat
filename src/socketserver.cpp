@@ -8,6 +8,9 @@
 #include <string> 
 #include<iostream>
 #include<memory>
+#include <wx/filename.h>
+#include <wx/colour.h>
+#include <wx/image.h>
 
 using namespace std;
 
@@ -48,23 +51,30 @@ void socketServer::receiving()
         exit(EXIT_FAILURE); 
     } 
 }
-void socketServer::accepting()
+void socketServer::accepting(ChatBotFrame *chatBotFrame)
 {
     if ((new_socket = accept(server_fd, (struct sockaddr *)&address,  (socklen_t*)&addrlen))<0) 
     { 
         perror("accept"); 
         exit(EXIT_FAILURE); 
     } 
+    
+        valread = read( new_socket , buffer, 1024); 
+        wxString botText(buffer, wxConvUTF8);
+        chatBotFrame->_panelDialog->AddDialogItem(botText, false,false);
+        buffer[1024]={0};
+
+    
 }
-char *socketServer::reading()
-{
-    valread = read( new_socket , buffer, 1024); 
-    return buffer;
-}
-void socketServer::printing()
-{
-    printf("%s\n",buffer ); 
-}
+// char *socketServer::reading()
+// {
+//     valread = read( new_socket , buffer, 1024); 
+//     return buffer;
+// }
+// void socketServer::printing()
+// {
+//     printf("%s\n",buffer ); 
+// }
 // int main()
 // {
 //     socketServer socket;

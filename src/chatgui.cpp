@@ -3,10 +3,12 @@
 #include <wx/image.h>
 #include <string>
 #include<iostream>
+#include<thread>
 
 using namespace std;
 
 #include "chatgui.h"
+
 
 // size of chatbot window
 const int width = 414;
@@ -30,6 +32,7 @@ bool ChatBotApp::OnInit()
 // wxWidgets FRAME
 ChatBotFrame::ChatBotFrame(const wxString &title) : wxFrame(NULL, wxID_ANY, title, wxDefaultPosition, wxSize(width, height))
 {
+    socket=new socketServer;
     
     // create panel with background image
     ChatBotFrameImagePanel *ctrlPanel = new ChatBotFrameImagePanel(this);
@@ -67,6 +70,8 @@ ChatBotFrame::ChatBotFrame(const wxString &title) : wxFrame(NULL, wxID_ANY, titl
     Connect(wxID_EXIT, wxEVT_COMMAND_MENU_SELECTED,
       wxCommandEventHandler(ChatBotFrame::OnQuit));
 
+    isListening=false;
+
     // position window in screen center
     this->Centre();
 }
@@ -77,7 +82,7 @@ void ChatBotFrame::OnEnter(wxCommandEvent &WXUNUSED(event))
     wxString userText = _userTextCtrl->GetLineText(0);
 
     // add new user text to dialog
-    _panelDialog->AddDialogItem(userText, true);
+    _panelDialog->AddDialogItem(userText, true,false);
 
     // delete text in text control
     _userTextCtrl->Clear();
@@ -140,21 +145,28 @@ ChatBotPanelDialog::~ChatBotPanelDialog()
 {
     
 }
-void ChatBotPanelDialog::AddDialogItem(wxString text, bool isFromUser)
+void ChatBotPanelDialog::AddDialogItem(wxString text, bool isFromUser,bool isInformation)
 {
     // add a single dialog element to the sizer
-    ChatBotPanelDialogItem *item = new ChatBotPanelDialogItem(this, text, isFromUser);
-    if (isFromUser==true)
+    ChatBotPanelDialogItem *item = new ChatBotPanelDialogItem(this, text, isFromUser,isInformation);
+    if (isInformation==false)
     {
-        _dialogSizer->Add(item, 0, wxALL | wxALIGN_LEFT , 8);
+        if (isFromUser==true)
+        {
+            _dialogSizer->Add(item, 0, wxALL | wxALIGN_LEFT , 8);
+        }
+        else
+        {
+            _dialogSizer->Add(item, 0, wxALL | wxALIGN_RIGHT, 8);
+        }
+        
     }
     else
     {
-       _dialogSizer->Add(item, 0, wxALL | wxALIGN_RIGHT, 8);
+        _dialogSizer->Add(item, 0, wxALL | wxALIGN_CENTER, 8);
+        
     }
-    
     _dialogSizer->Layout();
-
     // make scrollbar show up
     this->FitInside(); // ask the sizer about the needed size
     this->SetScrollRate(5, 5);
@@ -197,28 +209,46 @@ void ChatBotPanelDialog::render(wxDC &dc)
     dc.DrawBitmap(_image, 0, 0, false);
 }
 
-ChatBotPanelDialogItem::ChatBotPanelDialogItem(wxPanel *parent, wxString text, bool isFromUser)
+ChatBotPanelDialogItem::ChatBotPanelDialogItem(wxPanel *parent, wxString text, bool isFromUser,bool isInformation)
     : wxPanel(parent, -1, wxPoint(-1, -1), wxSize(-1, -1), wxBORDER_NONE)
 {
     // retrieve image from chatbot
     wxBitmap *bitmap = nullptr; 
 
     // create image and text
-    _chatBotImg = new wxStaticBitmap(this, wxID_ANY, (isFromUser ? wxBitmap(imgBasePath + "user.png", wxBITMAP_TYPE_PNG) : wxBitmap(imgBasePath + "user.png", wxBITMAP_TYPE_PNG)), wxPoint(-1, -1), wxSize(-1, -1));
-    _chatBotTxt = new wxStaticText(this, wxID_ANY, text, wxPoint(-1, -1), wxSize(150, -1), wxALIGN_CENTRE | wxBORDER_NONE);
-    _chatBotTxt->SetForegroundColour(isFromUser == true ? wxColor(*wxBLACK) : wxColor(*wxWHITE));
-
+    if(isInformation==false)
+    {
+        _chatBotImg = new wxStaticBitmap(this, wxID_ANY, (isFromUser ? wxBitmap(imgBasePath + "user.png", wxBITMAP_TYPE_PNG) : wxBitmap(imgBasePath + "user.png", wxBITMAP_TYPE_PNG)), wxPoint(-1, -1), wxSize(-1, -1));
+        _chatBotTxt = new wxStaticText(this, wxID_ANY, text, wxPoint(-1, -1), wxSize(150, -1), wxALIGN_CENTRE | wxBORDER_NONE);
+        _chatBotTxt->SetForegroundColour(isFromUser == true ? wxColor(*wxBLACK) : wxColor(*wxWHITE));
+    }
+    else
+    {
+        _chatBotTxt = new wxStaticText(this, wxID_ANY, text, wxPoint(-1, -1), wxSize(150, -1), wxALIGN_CENTRE | wxBORDER_NONE);
+        _chatBotTxt->SetForegroundColour(wxColor(*wxBLACK));
+    }
+    
     // create sizer and add elements
     wxBoxSizer *horzBoxSizer = new wxBoxSizer(wxHORIZONTAL);
     horzBoxSizer->Add(_chatBotTxt, 8, wxEXPAND | wxALL, 1);
-    horzBoxSizer->Add(_chatBotImg, 2, wxEXPAND | wxALL, 1);
+    if (isInformation==false){
+        horzBoxSizer->Add(_chatBotImg, 2, wxEXPAND | wxALL, 1);
+    }
     this->SetSizer(horzBoxSizer);
 
     // wrap text after 150 pixels
     _chatBotTxt->Wrap(150);
 
     // set background color
-    this->SetBackgroundColour((isFromUser == true ? wxT("YELLOW") : wxT("BLUE")));
+    if(isInformation==false)
+    {
+        this->SetBackgroundColour((isFromUser == true ? wxT("YELLOW") : wxT("BLUE")));
+    }
+    else
+    {
+        this->SetBackgroundColour(wxT("WHITE")); 
+    }
+    
 }
 void ChatBotFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 {
@@ -233,17 +263,32 @@ void ChatBotFrame::OnListen(wxCommandEvent& WXUNUSED(event))
 
 void ChatBotFrame::OnConnect(wxCommandEvent& WXUNUSED(event))
 {
-  
+  //wxTextCtrl * ipinput=new wxTextCtrl(ctrlPanel, 2, "", wxDefaultPosition, wxSize(width, 50), wxTE_PROCESS_ENTER, wxDefaultValidator, wxTextCtrlNameStr);
 }
 void ChatBotFrame::startServer()
 {
-    socket=std::make_unique<socketServer>();
-    socket->attachPort();
-    socket->receiving();
-    socket->accepting();
-    char *a=socket->reading();
-    // //string a="holi";
-     wxString botText(a, wxConvUTF8);
-    // //cout<<a<<endl;
-     _panelDialog->AddDialogItem(botText, false);
+    
+    if (isListening==false)
+    {
+        
+        socket->attachPort();
+        socket->receiving();
+        //socket->accepting(this);
+        std::thread t=std::thread(&socketServer::accepting,socket,this);
+        t.detach();
+        //char *a=socket->reading();
+        // //string a="holi";
+        //wxString botText(a, wxConvUTF8);
+        // //cout<<a<<endl;
+        //_panelDialog->AddDialogItem(botText, false,false);
+        isListening=true;
+    }
+    else
+    {
+         char *a="The chat is already listening petitions";
+         wxString botText(a, wxConvUTF8);
+        _panelDialog->AddDialogItem(botText, false,true);
+    }
+    
+   
 }

@@ -10,7 +10,7 @@ class socketClient
     int sock;
     int valread;
     struct sockaddr_in serv_addr; 
-    char *hello = "Hello from client"; 
+    char *hello = "Hellofromclient"; 
     char buffer[1024] = {0}; 
 
     public:

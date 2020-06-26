@@ -3,9 +3,13 @@
 
 #include <wx/wx.h>
 #include<memory>
-#include"socketserver.h"
+#include<mutex>
+#include "socketserver.h"
+
+
 
 class ChatLogic; // forward declaration
+class socketServer; // forward declaration
 
 // middle part of the window containing the dialog between user and chatbot
 class ChatBotPanelDialog : public wxScrolledWindow
@@ -27,7 +31,7 @@ public:
     void render(wxDC &dc);
 
     // proprietary functions
-    void AddDialogItem(wxString text, bool isFromUser = true);
+    void AddDialogItem(wxString text, bool isFromUser = true,bool isInformation=false);
     void PrintChatbotResponse(std::string response);
 
     DECLARE_EVENT_TABLE()
@@ -43,7 +47,7 @@ private:
 
 public:
     // constructor / destructor
-    ChatBotPanelDialogItem(wxPanel *parent, wxString text, bool isFromUser);
+    ChatBotPanelDialogItem(wxPanel *parent, wxString text, bool isFromUser,bool isInformation);
 };
 
 // frame containing all control elements
@@ -51,19 +55,23 @@ class ChatBotFrame : public wxFrame
 {
 private:
     // control elements
-    ChatBotPanelDialog *_panelDialog;
+    
     wxTextCtrl *_userTextCtrl;
     wxMenuBar *m_pMenuBar;
     wxMenu *m_pFileMenu;
-    std::unique_ptr<socketServer> socket;
+    socketServer *socket;
     void OnQuit(wxCommandEvent& WXUNUSED(event));
     void OnConnect(wxCommandEvent& WXUNUSED(event));
     void OnListen(wxCommandEvent& WXUNUSED(event));
     // events
     void OnEnter(wxCommandEvent &WXUNUSED(event));
     void startServer();
+    std::mutex t;
+    //sockets
+    bool isListening;
 
 public:
+    ChatBotPanelDialog *_panelDialog;
     // constructor / desctructor
     
     ChatBotFrame(const wxString &title);

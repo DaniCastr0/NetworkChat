@@ -8,7 +8,7 @@ class socketServer{
     int server_fd, new_socket, valread; 
     struct sockaddr_in address; 
     int opt; 
-    char buffer[1024]; 
+    char buffer[1024]={0}; 
     int addrlen;
 
     public:
@@ -16,7 +16,7 @@ class socketServer{
     void attachPort();
     void receiving();
     void accepting();
-    char reading();
+    char *reading();
     void printing();
     
 };
