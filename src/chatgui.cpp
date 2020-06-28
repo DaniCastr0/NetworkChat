@@ -33,9 +33,13 @@ bool ChatBotApp::OnInit()
 ChatBotFrame::ChatBotFrame(const wxString &title) : wxFrame(NULL, wxID_ANY, title, wxDefaultPosition, wxSize(width, height))
 {
     socket=new socketServer;
+    socketclient=new socketClient;
+    isConected=false;
     
     // create panel with background image
     ChatBotFrameImagePanel *ctrlPanel = new ChatBotFrameImagePanel(this);
+
+    ipserver="";
 
     // create controls and assign them to control panel
     _panelDialog = new ChatBotPanelDialog(ctrlPanel, wxID_ANY);
@@ -83,6 +87,13 @@ void ChatBotFrame::OnEnter(wxCommandEvent &WXUNUSED(event))
 
     // add new user text to dialog
     _panelDialog->AddDialogItem(userText, true,false);
+
+    if (isConected==true){
+        socketclient->sending(userText.mb_str());
+    }
+    if (isListening==true){
+        socket->sending(userText).mb_str();
+    }
 
     // delete text in text control
     _userTextCtrl->Clear();
@@ -250,6 +261,41 @@ ChatBotPanelDialogItem::ChatBotPanelDialogItem(wxPanel *parent, wxString text, b
     }
     
 }
+ipbox::ipbox(const wxString & title,ChatBotFrame* chatBotFrame)
+       : wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(300, 130))
+{
+
+  _chatBotFrame=chatBotFrame;
+  wxPanel *panel = new wxPanel(this, -1);
+
+  wxBoxSizer *vbox = new wxBoxSizer(wxVERTICAL);
+  wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
+
+  
+
+  
+  tc = new wxTextCtrl(panel, -1, wxT("insert server IP"), 
+      wxPoint(30, 20),wxSize(220, 30));
+
+  okButton = new wxButton(this, -1, wxT("Ok"), 
+      wxDefaultPosition, wxSize(70, 30));
+  
+  okButton->Bind(wxEVT_BUTTON,&ipbox::buttoncliked,this);
+
+  hbox->Add(okButton, 1);
+  
+
+  vbox->Add(panel, 1);
+  vbox->Add(hbox, 0, wxALIGN_CENTER | wxTOP | wxBOTTOM, 10);
+
+  SetSizer(vbox);
+
+  Centre();
+  ShowModal();
+
+  Destroy(); 
+}
+
 void ChatBotFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 {
   Close(true);
@@ -263,7 +309,10 @@ void ChatBotFrame::OnListen(wxCommandEvent& WXUNUSED(event))
 
 void ChatBotFrame::OnConnect(wxCommandEvent& WXUNUSED(event))
 {
-  //wxTextCtrl * ipinput=new wxTextCtrl(ctrlPanel, 2, "", wxDefaultPosition, wxSize(width, 50), wxTE_PROCESS_ENTER, wxDefaultValidator, wxTextCtrlNameStr);
+  ipbox *box = new ipbox(wxT("CustomDialog"),this);
+  box->Show(true);
+
+    
 }
 void ChatBotFrame::startServer()
 {
@@ -289,6 +338,21 @@ void ChatBotFrame::startServer()
          wxString botText(a, wxConvUTF8);
         _panelDialog->AddDialogItem(botText, false,true);
     }
+}
+void ChatBotFrame::startClient()
+{
+    socketclient->ipbin(this->ipserver);
+    socketclient->connecting();
+    isConected=true;
+    std::thread t=std::thread(&socketClient::receiving,socketclient,this);
+    t.detach();
     
-   
+    
+}
+void ipbox::buttoncliked(wxCommandEvent& WXUNUSED(event))
+{
+    ip=tc->GetLineText(0);
+    _chatBotFrame->ipserver=ip;
+    _chatBotFrame->startClient();
+    Close(true);
 }

@@ -58,13 +58,19 @@ void socketServer::accepting(ChatBotFrame *chatBotFrame)
         perror("accept"); 
         exit(EXIT_FAILURE); 
     } 
-    
-        valread = read( new_socket , buffer, 1024); 
+    while (1){
+        //cout<<"bucle"<<endl;
+        
+        while (valread = read( new_socket , buffer, 1024)>0) {
+        cout<<"recibo del cliente un mensaje"<<endl;
         wxString botText(buffer, wxConvUTF8);
-        chatBotFrame->_panelDialog->AddDialogItem(botText, false,false);
-        buffer[1024]={0};
+        chatBotFrame->_panelDialog->AddDialogItem(botText, false,false);}}
 
     
+}
+void socketServer::sending(char *msg)
+{
+    send(new_socket , msg , strlen(msg) , 0 ); 
 }
 // char *socketServer::reading()
 // {

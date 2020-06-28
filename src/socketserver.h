@@ -16,6 +16,7 @@ class socketServer{
     struct sockaddr_in address; 
     int opt; 
     char buffer[1024]={0}; 
+    char *hello = "Hellofromclient"; 
     int addrlen;
     
 
@@ -24,8 +25,8 @@ class socketServer{
     void attachPort();
     void receiving();
     void accepting(ChatBotFrame *chatBotFrame);
-    //char *reading();
-    //void printing();
+    void sending(char *msg);
+    
     
 };
 #endif

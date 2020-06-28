@@ -1,9 +1,15 @@
+#ifndef CLIENT_H_
+#define CLIENT_H_
+
 #include <stdio.h> 
 #include <sys/socket.h> 
 #include <arpa/inet.h> 
 #include <unistd.h> 
 #include <string.h> 
+#include "chatgui.h"
 #define PORT 8080 
+
+class ChatBotFrame;
 
 class socketClient
 {
@@ -15,7 +21,9 @@ class socketClient
 
     public:
     socketClient();
-    void ipbin();
+    void ipbin(std::string ip);
     void connecting();
-    void sending();
+    void sending(char *msg);
+    void receiving(wxString chatBotFrame);
 };
+#endif

@@ -4,12 +4,16 @@
 #include <wx/wx.h>
 #include<memory>
 #include<mutex>
+#include<string>
 #include "socketserver.h"
+#include "socketclient.h"
+
 
 
 
 class ChatLogic; // forward declaration
 class socketServer; // forward declaration
+class socketClient; // forward declaration
 
 // middle part of the window containing the dialog between user and chatbot
 class ChatBotPanelDialog : public wxScrolledWindow
@@ -60,17 +64,22 @@ private:
     wxMenuBar *m_pMenuBar;
     wxMenu *m_pFileMenu;
     socketServer *socket;
+    socketClient *socketclient;
+    bool isConected;
     void OnQuit(wxCommandEvent& WXUNUSED(event));
     void OnConnect(wxCommandEvent& WXUNUSED(event));
     void OnListen(wxCommandEvent& WXUNUSED(event));
     // events
     void OnEnter(wxCommandEvent &WXUNUSED(event));
     void startServer();
+    
     std::mutex t;
     //sockets
     bool isListening;
 
 public:
+    void startClient();
+    std::string ipserver;
     ChatBotPanelDialog *_panelDialog;
     // constructor / desctructor
     
@@ -94,6 +103,19 @@ public:
 
     DECLARE_EVENT_TABLE()
 };
+class ipbox : public wxDialog
+{
+wxTextCtrl *tc;
+wxButton *okButton;
+std::string ip;
+ChatBotFrame* _chatBotFrame;
+
+public:
+  ipbox(const wxString& title,ChatBotFrame* chatBotFrame);
+  void buttoncliked(wxCommandEvent& WXUNUSED(event));
+
+};
+
 
 // wxWidgets app that hides main()
 class ChatBotApp : public wxApp

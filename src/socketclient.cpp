@@ -1,6 +1,10 @@
 
 // Client side C/C++ program to demonstrate Socket programming 
 #include "socketclient.h"
+#include <wx/filename.h>
+#include <wx/colour.h>
+#include <wx/image.h>
+#include<string>
 
 socketClient::socketClient()
 {
@@ -14,9 +18,9 @@ socketClient::socketClient()
     serv_addr.sin_port = htons(PORT); 
 }
 
-void socketClient::ipbin()
+void socketClient::ipbin(std::string ip)
 {
-    if(inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr)<=0)  
+    if(inet_pton(AF_INET, ip.c_str(), &serv_addr.sin_addr)<=0)  
     { 
         printf("\nInvalid address/ Address not supported \n"); 
         
@@ -31,16 +35,16 @@ void socketClient::connecting()
         
     } 
 }
-void socketClient::sending()
+void socketClient::sending(char *msg)
 {
-    send(sock , hello , strlen(hello) , 0 ); 
+    send(sock , msg , strlen(msg) , 0 ); 
+}
+void socketClient::receiving(ChatBotFrame *chatBotFrame)
+{
+    while (1){
+        //cout<<"bucle"<<endl;
+        while (valread = read( sock , buffer, 1024)>0) {
+        wxString botText(buffer, wxConvUTF8);
+        chatBotFrame->_panelDialog->AddDialogItem(botText, false,false);}}
 }
    
-int main(int argc, char const *argv[]) 
-{ 
-    socketClient socketclient;
-    socketclient.ipbin();
-    socketclient.connecting();
-    socketclient.sending();
-    return 0; 
-} 
