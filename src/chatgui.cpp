@@ -85,14 +85,16 @@ void ChatBotFrame::OnEnter(wxCommandEvent &WXUNUSED(event))
     // retrieve text from text control
     wxString userText = _userTextCtrl->GetLineText(0);
 
+    char msg[1024];
+    strncpy(msg, (const char*)userText.mb_str(wxConvUTF8), 1023);
     // add new user text to dialog
     _panelDialog->AddDialogItem(userText, true,false);
 
     if (isConected==true){
-        socketclient->sending(userText.mb_str());
+        socketclient->sending(msg);
     }
     if (isListening==true){
-        socket->sending(userText).mb_str();
+        socket->sending(msg);
     }
 
     // delete text in text control

@@ -25,7 +25,7 @@ class socketServer{
     void attachPort();
     void receiving();
     void accepting(ChatBotFrame *chatBotFrame);
-    void sending(char *msg);
+    void sending(char* msg);
     
     
 };

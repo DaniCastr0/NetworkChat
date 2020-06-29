@@ -68,9 +68,9 @@ void socketServer::accepting(ChatBotFrame *chatBotFrame)
 
     
 }
-void socketServer::sending(char *msg)
+void socketServer::sending(char* msg)
 {
-    send(new_socket , msg , strlen(msg) , 0 ); 
+    send(new_socket , msg, strlen(msg) , 0 ); 
 }
 // char *socketServer::reading()
 // {

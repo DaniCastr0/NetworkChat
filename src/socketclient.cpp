@@ -35,7 +35,7 @@ void socketClient::connecting()
         
     } 
 }
-void socketClient::sending(char *msg)
+void socketClient::sending(char* msg)
 {
     send(sock , msg , strlen(msg) , 0 ); 
 }

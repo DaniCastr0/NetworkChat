@@ -23,7 +23,7 @@ class socketClient
     socketClient();
     void ipbin(std::string ip);
     void connecting();
-    void sending(char *msg);
-    void receiving(wxString chatBotFrame);
+    void sending(char* msg);
+    void receiving(ChatBotFrame *chatBotFrame);
 };
 #endif
