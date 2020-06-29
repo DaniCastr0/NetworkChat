@@ -46,6 +46,22 @@ string
 chatgui.h
 ../include/chatgui.h
 
+/home/dani/capstone/src/chatgui.cpp
+wx/filename.h
+-
+wx/colour.h
+-
+wx/image.h
+-
+string
+-
+iostream
+-
+thread
+-
+chatgui.h
+/home/dani/capstone/src/chatgui.h
+
 /home/dani/capstone/src/socketclient.cpp
 socketclient.h
 /home/dani/capstone/src/socketclient.h
