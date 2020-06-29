@@ -10,44 +10,44 @@ using namespace std;
 #include "chatgui.h"
 
 
-// size of chatbot window
+// size of NetworkChat window
 const int width = 414;
 const int height = 736;
 
 // wxWidgets APP
-IMPLEMENT_APP(ChatBotApp);
+IMPLEMENT_APP(NetworkChatApp);
 
 
 std::string imgBasePath = "../images/";
 
-bool ChatBotApp::OnInit()
+bool NetworkChatApp::OnInit()
 {
     // create window with name and show it
-    ChatBotFrame *chatBotFrame = new ChatBotFrame(wxT("NetworkChat C++"));
-    chatBotFrame->Show(true);
+    NetworkChatFrame *networkChatFrame = new NetworkChatFrame(wxT("NetworkChat C++"));
+    networkChatFrame->Show(true);
 
     return true;
 }
 
 // wxWidgets FRAME
-ChatBotFrame::ChatBotFrame(const wxString &title) : wxFrame(NULL, wxID_ANY, title, wxDefaultPosition, wxSize(width, height))
+NetworkChatFrame::NetworkChatFrame(const wxString &title) : wxFrame(NULL, wxID_ANY, title, wxDefaultPosition, wxSize(width, height))
 {
-    socket=new socketServer;
-    socketclient=new socketClient;
+    socket=std::make_shared<socketServer>();
+    socketclient=std::make_shared<socketClient>();
     isConected=false;
     
     // create panel with background image
-    ChatBotFrameImagePanel *ctrlPanel = new ChatBotFrameImagePanel(this);
+    NetworkChatFrameImagePanel *ctrlPanel = new NetworkChatFrameImagePanel(this);
 
     ipserver="";
 
     // create controls and assign them to control panel
-    _panelDialog = new ChatBotPanelDialog(ctrlPanel, wxID_ANY);
+    _panelDialog = new NetworkChatPanelDialog(ctrlPanel, wxID_ANY);
 
     // create text control for user input
     int idTextXtrl = 1;
     _userTextCtrl = new wxTextCtrl(ctrlPanel, idTextXtrl, "", wxDefaultPosition, wxSize(width, 50), wxTE_PROCESS_ENTER, wxDefaultValidator, wxTextCtrlNameStr);
-    Connect(idTextXtrl, wxEVT_TEXT_ENTER, wxCommandEventHandler(ChatBotFrame::OnEnter));
+    Connect(idTextXtrl, wxEVT_TEXT_ENTER, wxCommandEventHandler(NetworkChatFrame::OnEnter));
 
     // create vertical sizer for panel alignment and add panels
     wxBoxSizer *vertBoxSizer = new wxBoxSizer(wxVERTICAL);
@@ -68,11 +68,11 @@ ChatBotFrame::ChatBotFrame(const wxString &title) : wxFrame(NULL, wxID_ANY, titl
     SetMenuBar(m_pMenuBar);
 
     Connect(wxID_EXECUTE, wxEVT_COMMAND_MENU_SELECTED,
-      wxCommandEventHandler(ChatBotFrame::OnListen));
+      wxCommandEventHandler(NetworkChatFrame::OnListen));
     Connect(wxID_ADD, wxEVT_COMMAND_MENU_SELECTED,
-      wxCommandEventHandler(ChatBotFrame::OnConnect));
+      wxCommandEventHandler(NetworkChatFrame::OnConnect));
     Connect(wxID_EXIT, wxEVT_COMMAND_MENU_SELECTED,
-      wxCommandEventHandler(ChatBotFrame::OnQuit));
+      wxCommandEventHandler(NetworkChatFrame::OnQuit));
 
     isListening=false;
 
@@ -80,7 +80,7 @@ ChatBotFrame::ChatBotFrame(const wxString &title) : wxFrame(NULL, wxID_ANY, titl
     this->Centre();
 }
 
-void ChatBotFrame::OnEnter(wxCommandEvent &WXUNUSED(event))
+void NetworkChatFrame::OnEnter(wxCommandEvent &WXUNUSED(event))
 {
     // retrieve text from text control
     wxString userText = _userTextCtrl->GetLineText(0);
@@ -103,30 +103,30 @@ void ChatBotFrame::OnEnter(wxCommandEvent &WXUNUSED(event))
    
 }
 
-BEGIN_EVENT_TABLE(ChatBotFrameImagePanel, wxPanel)
-EVT_PAINT(ChatBotFrameImagePanel::paintEvent) // catch paint events
+BEGIN_EVENT_TABLE(NetworkChatFrameImagePanel, wxPanel)
+EVT_PAINT(NetworkChatFrameImagePanel::paintEvent) // catch paint events
 END_EVENT_TABLE()
 
-ChatBotFrameImagePanel::ChatBotFrameImagePanel(wxFrame *parent) : wxPanel(parent)
+NetworkChatFrameImagePanel::NetworkChatFrameImagePanel(wxFrame *parent) : wxPanel(parent)
 {
 }
 
-void ChatBotFrameImagePanel::paintEvent(wxPaintEvent &evt)
+void NetworkChatFrameImagePanel::paintEvent(wxPaintEvent &evt)
 {
     wxPaintDC dc(this);
     render(dc);
 }
 
-void ChatBotFrameImagePanel::paintNow()
+void NetworkChatFrameImagePanel::paintNow()
 {
     wxClientDC dc(this);
     render(dc);
 }
 
-void ChatBotFrameImagePanel::render(wxDC &dc)
+void NetworkChatFrameImagePanel::render(wxDC &dc)
 {
     // load backgroud image from file
-    wxString imgFile = imgBasePath + "gijon.jpg";
+    wxString imgFile = imgBasePath + "asturias.png";
     wxImage image;
     image.LoadFile(imgFile);
 
@@ -138,11 +138,11 @@ void ChatBotFrameImagePanel::render(wxDC &dc)
     dc.DrawBitmap(_image, 0, 0, false);
 }
 
-BEGIN_EVENT_TABLE(ChatBotPanelDialog, wxPanel)
-EVT_PAINT(ChatBotPanelDialog::paintEvent) // catch paint events
+BEGIN_EVENT_TABLE(NetworkChatPanelDialog, wxPanel)
+EVT_PAINT(NetworkChatPanelDialog::paintEvent) // catch paint events
 END_EVENT_TABLE()
 
-ChatBotPanelDialog::ChatBotPanelDialog(wxWindow *parent, wxWindowID id)
+NetworkChatPanelDialog::NetworkChatPanelDialog(wxWindow *parent, wxWindowID id)
     : wxScrolledWindow(parent, id)
 {
     // sizer will take care of determining the needed scroll size
@@ -154,14 +154,14 @@ ChatBotPanelDialog::ChatBotPanelDialog(wxWindow *parent, wxWindowID id)
 
 }
 
-ChatBotPanelDialog::~ChatBotPanelDialog()
+NetworkChatPanelDialog::~NetworkChatPanelDialog()
 {
     
 }
-void ChatBotPanelDialog::AddDialogItem(wxString text, bool isFromUser,bool isInformation)
+void NetworkChatPanelDialog::AddDialogItem(wxString text, bool isFromUser,bool isInformation)
 {
     // add a single dialog element to the sizer
-    ChatBotPanelDialogItem *item = new ChatBotPanelDialogItem(this, text, isFromUser,isInformation);
+    NetworkChatPanelDialogItem *item = new NetworkChatPanelDialogItem(this, text, isFromUser,isInformation);
     if (isInformation==false)
     {
         if (isFromUser==true)
@@ -192,28 +192,28 @@ void ChatBotPanelDialog::AddDialogItem(wxString text, bool isFromUser,bool isInf
     this->DoScroll(0, sy);
 }
 
-void ChatBotPanelDialog::PrintChatbotResponse(std::string response)
+void NetworkChatPanelDialog::PrintNetworkChatResponse(std::string response)
 {
     // convert string into wxString and add dialog element
     
 }
 
-void ChatBotPanelDialog::paintEvent(wxPaintEvent &evt)
+void NetworkChatPanelDialog::paintEvent(wxPaintEvent &evt)
 {
     wxPaintDC dc(this);
     render(dc);
 }
 
-void ChatBotPanelDialog::paintNow()
+void NetworkChatPanelDialog::paintNow()
 {
     wxClientDC dc(this);
     render(dc);
 }
 
-void ChatBotPanelDialog::render(wxDC &dc)
+void NetworkChatPanelDialog::render(wxDC &dc)
 {
     wxImage image;
-    image.LoadFile(imgBasePath + "gijon.jpg");
+    image.LoadFile(imgBasePath + "gijon.jpeg");
 
     wxSize sz = this->GetSize();
     wxImage imgSmall = image.Rescale(sz.GetWidth(), sz.GetHeight(), wxIMAGE_QUALITY_HIGH);
@@ -222,35 +222,35 @@ void ChatBotPanelDialog::render(wxDC &dc)
     dc.DrawBitmap(_image, 0, 0, false);
 }
 
-ChatBotPanelDialogItem::ChatBotPanelDialogItem(wxPanel *parent, wxString text, bool isFromUser,bool isInformation)
+NetworkChatPanelDialogItem::NetworkChatPanelDialogItem(wxPanel *parent, wxString text, bool isFromUser,bool isInformation)
     : wxPanel(parent, -1, wxPoint(-1, -1), wxSize(-1, -1), wxBORDER_NONE)
 {
-    // retrieve image from chatbot
+    // retrieve image from NetworkChat
     wxBitmap *bitmap = nullptr; 
 
     // create image and text
     if(isInformation==false)
     {
-        _chatBotImg = new wxStaticBitmap(this, wxID_ANY, (isFromUser ? wxBitmap(imgBasePath + "user.png", wxBITMAP_TYPE_PNG) : wxBitmap(imgBasePath + "user.png", wxBITMAP_TYPE_PNG)), wxPoint(-1, -1), wxSize(-1, -1));
-        _chatBotTxt = new wxStaticText(this, wxID_ANY, text, wxPoint(-1, -1), wxSize(150, -1), wxALIGN_CENTRE | wxBORDER_NONE);
-        _chatBotTxt->SetForegroundColour(isFromUser == true ? wxColor(*wxBLACK) : wxColor(*wxWHITE));
+        _NetworkChatImg = new wxStaticBitmap(this, wxID_ANY, (isFromUser ? wxBitmap(imgBasePath + "user.png", wxBITMAP_TYPE_PNG) : wxBitmap(imgBasePath + "user.png", wxBITMAP_TYPE_PNG)), wxPoint(-1, -1), wxSize(-1, -1));
+        _NetworkChatTxt = new wxStaticText(this, wxID_ANY, text, wxPoint(-1, -1), wxSize(150, -1), wxALIGN_CENTRE | wxBORDER_NONE);
+        _NetworkChatTxt->SetForegroundColour(isFromUser == true ? wxColor(*wxBLACK) : wxColor(*wxWHITE));
     }
     else
     {
-        _chatBotTxt = new wxStaticText(this, wxID_ANY, text, wxPoint(-1, -1), wxSize(150, -1), wxALIGN_CENTRE | wxBORDER_NONE);
-        _chatBotTxt->SetForegroundColour(wxColor(*wxBLACK));
+        _NetworkChatTxt = new wxStaticText(this, wxID_ANY, text, wxPoint(-1, -1), wxSize(150, -1), wxALIGN_CENTRE | wxBORDER_NONE);
+        _NetworkChatTxt->SetForegroundColour(wxColor(*wxBLACK));
     }
     
     // create sizer and add elements
     wxBoxSizer *horzBoxSizer = new wxBoxSizer(wxHORIZONTAL);
-    horzBoxSizer->Add(_chatBotTxt, 8, wxEXPAND | wxALL, 1);
+    horzBoxSizer->Add(_NetworkChatTxt, 8, wxEXPAND | wxALL, 1);
     if (isInformation==false){
-        horzBoxSizer->Add(_chatBotImg, 2, wxEXPAND | wxALL, 1);
+        horzBoxSizer->Add(_NetworkChatImg, 2, wxEXPAND | wxALL, 1);
     }
     this->SetSizer(horzBoxSizer);
 
     // wrap text after 150 pixels
-    _chatBotTxt->Wrap(150);
+    _NetworkChatTxt->Wrap(150);
 
     // set background color
     if(isInformation==false)
@@ -263,11 +263,11 @@ ChatBotPanelDialogItem::ChatBotPanelDialogItem(wxPanel *parent, wxString text, b
     }
     
 }
-ipbox::ipbox(const wxString & title,ChatBotFrame* chatBotFrame)
+ipbox::ipbox(const wxString & title,NetworkChatFrame* networkChatFrame)
        : wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(300, 130))
 {
 
-  _chatBotFrame=chatBotFrame;
+  _networkChatFrame=networkChatFrame;
   wxPanel *panel = new wxPanel(this, -1);
 
   wxBoxSizer *vbox = new wxBoxSizer(wxVERTICAL);
@@ -298,25 +298,25 @@ ipbox::ipbox(const wxString & title,ChatBotFrame* chatBotFrame)
   Destroy(); 
 }
 
-void ChatBotFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
+void NetworkChatFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 {
   Close(true);
 }
-void ChatBotFrame::OnListen(wxCommandEvent& WXUNUSED(event))
+void NetworkChatFrame::OnListen(wxCommandEvent& WXUNUSED(event))
 {
   startServer();
   
 }
   
 
-void ChatBotFrame::OnConnect(wxCommandEvent& WXUNUSED(event))
+void NetworkChatFrame::OnConnect(wxCommandEvent& WXUNUSED(event))
 {
   ipbox *box = new ipbox(wxT("CustomDialog"),this);
   box->Show(true);
 
     
 }
-void ChatBotFrame::startServer()
+void NetworkChatFrame::startServer()
 {
     
     if (isListening==false)
@@ -324,14 +324,8 @@ void ChatBotFrame::startServer()
         
         socket->attachPort();
         socket->receiving();
-        //socket->accepting(this);
         std::thread t=std::thread(&socketServer::accepting,socket,this);
         t.detach();
-        //char *a=socket->reading();
-        // //string a="holi";
-        //wxString botText(a, wxConvUTF8);
-        // //cout<<a<<endl;
-        //_panelDialog->AddDialogItem(botText, false,false);
         isListening=true;
     }
     else
@@ -341,7 +335,7 @@ void ChatBotFrame::startServer()
         _panelDialog->AddDialogItem(botText, false,true);
     }
 }
-void ChatBotFrame::startClient()
+void NetworkChatFrame::startClient()
 {
     socketclient->ipbin(this->ipserver);
     socketclient->connecting();
@@ -354,7 +348,7 @@ void ChatBotFrame::startClient()
 void ipbox::buttoncliked(wxCommandEvent& WXUNUSED(event))
 {
     ip=tc->GetLineText(0);
-    _chatBotFrame->ipserver=ip;
-    _chatBotFrame->startClient();
+    _networkChatFrame->ipserver=ip;
+    _networkChatFrame->startClient();
     Close(true);
 }

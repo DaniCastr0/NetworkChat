@@ -51,7 +51,7 @@ void socketServer::receiving()
         exit(EXIT_FAILURE); 
     } 
 }
-void socketServer::accepting(ChatBotFrame *chatBotFrame)
+void socketServer::accepting(NetworkChatFrame *networkChatFrame)
 {
     if ((new_socket = accept(server_fd, (struct sockaddr *)&address,  (socklen_t*)&addrlen))<0) 
     { 
@@ -64,7 +64,7 @@ void socketServer::accepting(ChatBotFrame *chatBotFrame)
         while (valread = read( new_socket , buffer, 1024)>0) {
         cout<<"recibo del cliente un mensaje"<<endl;
         wxString botText(buffer, wxConvUTF8);
-        chatBotFrame->_panelDialog->AddDialogItem(botText, false,false);}}
+        networkChatFrame->_panelDialog->AddDialogItem(botText, false,false);}}
 
     
 }

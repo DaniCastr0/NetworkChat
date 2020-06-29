@@ -39,12 +39,12 @@ void socketClient::sending(char* msg)
 {
     send(sock , msg , strlen(msg) , 0 ); 
 }
-void socketClient::receiving(ChatBotFrame *chatBotFrame)
+void socketClient::receiving(NetworkChatFrame *networkChatFrame)
 {
     while (1){
         //cout<<"bucle"<<endl;
         while (valread = read( sock , buffer, 1024)>0) {
         wxString botText(buffer, wxConvUTF8);
-        chatBotFrame->_panelDialog->AddDialogItem(botText, false,false);}}
+        networkChatFrame->_panelDialog->AddDialogItem(botText, false,false);}}
 }
    
