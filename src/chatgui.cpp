@@ -88,7 +88,10 @@ void NetworkChatFrame::OnEnter(wxCommandEvent &WXUNUSED(event))
     char msg[1024];
     strncpy(msg, (const char*)userText.mb_str(wxConvUTF8), 1023);
     // add new user text to dialog
+    
+    _mutex.lock();
     _panelDialog->AddDialogItem(userText, true,false);
+    _mutex.unlock();
 
     if (isConected==true){
         socketclient->sending(msg);
@@ -126,7 +129,7 @@ void NetworkChatFrameImagePanel::paintNow()
 void NetworkChatFrameImagePanel::render(wxDC &dc)
 {
     // load backgroud image from file
-    wxString imgFile = imgBasePath + "asturias.png";
+    wxString imgFile = imgBasePath + "gijon.jpg";
     wxImage image;
     image.LoadFile(imgFile);
 
@@ -213,7 +216,7 @@ void NetworkChatPanelDialog::paintNow()
 void NetworkChatPanelDialog::render(wxDC &dc)
 {
     wxImage image;
-    image.LoadFile(imgBasePath + "gijon.jpeg");
+    image.LoadFile(imgBasePath + "gijonin.jpg");
 
     wxSize sz = this->GetSize();
     wxImage imgSmall = image.Rescale(sz.GetWidth(), sz.GetHeight(), wxIMAGE_QUALITY_HIGH);
@@ -311,7 +314,7 @@ void NetworkChatFrame::OnListen(wxCommandEvent& WXUNUSED(event))
 
 void NetworkChatFrame::OnConnect(wxCommandEvent& WXUNUSED(event))
 {
-  ipbox *box = new ipbox(wxT("CustomDialog"),this);
+  ipbox *box = new ipbox(wxT("Server Ip"),this);
   box->Show(true);
 
     
@@ -330,8 +333,8 @@ void NetworkChatFrame::startServer()
     }
     else
     {
-         char *a="The chat is already listening petitions";
-         wxString botText(a, wxConvUTF8);
+         string a="The chat is already listening petitions";
+         wxString botText(a.c_str(), wxConvUTF8);
         _panelDialog->AddDialogItem(botText, false,true);
     }
 }

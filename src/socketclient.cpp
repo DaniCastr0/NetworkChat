@@ -1,17 +1,17 @@
 
-// Client side C/C++ program to demonstrate Socket programming 
 #include "socketclient.h"
 #include <wx/filename.h>
 #include <wx/colour.h>
 #include <wx/image.h>
 #include<string>
+#include<iostream>
 
 socketClient::socketClient()
 {
     sock = 0;
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) 
     { 
-        printf("\n Socket creation error \n"); 
+        std::cout<<"Socket creation error "<<std::endl; 
         
     } 
     serv_addr.sin_family = AF_INET; 
@@ -22,7 +22,7 @@ void socketClient::ipbin(std::string ip)
 {
     if(inet_pton(AF_INET, ip.c_str(), &serv_addr.sin_addr)<=0)  
     { 
-        printf("\nInvalid address/ Address not supported \n"); 
+        std::cout<<"Invalid address/ Address not supported"<<std::endl;  
         
     } 
 
@@ -31,7 +31,7 @@ void socketClient::connecting()
 {
     if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) 
     { 
-        printf("\nConnection Failed \n"); 
+        std::cout<<"Connection Failed "<<std::endl; 
         
     } 
 }
@@ -42,9 +42,10 @@ void socketClient::sending(char* msg)
 void socketClient::receiving(NetworkChatFrame *networkChatFrame)
 {
     while (1){
-        //cout<<"bucle"<<endl;
         while (valread = read( sock , buffer, 1024)>0) {
         wxString botText(buffer, wxConvUTF8);
-        networkChatFrame->_panelDialog->AddDialogItem(botText, false,false);}}
+        networkChatFrame->_mutex.lock();
+        networkChatFrame->_panelDialog->AddDialogItem(botText, false,false);}
+        networkChatFrame->_mutex.unlock();}
 }
    

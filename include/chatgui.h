@@ -73,13 +73,14 @@ private:
     void OnEnter(wxCommandEvent &WXUNUSED(event));
     void startServer();
     
-    std::mutex t;
 
     //flags for sockets
     bool isListening;
     bool isConected;
 
 public:
+    std::mutex _mutex;
+
     void startClient();
     std::string ipserver;
     NetworkChatPanelDialog *_panelDialog;

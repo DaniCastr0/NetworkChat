@@ -9,6 +9,8 @@
 
 #define PORT 8080 
 
+//based on tutorial on https://www.geeksforgeeks.org/socket-programming-cc/
+
 class NetworkChatFrame;
 
 class socketServer{
