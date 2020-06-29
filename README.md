@@ -2,8 +2,8 @@
 
 This is a starter repo for the Capstone project in the [Udacity C++ Nanodegree Program](https://www.udacity.com/course/c-plus-plus-nanodegree--nd213).
 
-This project isabout a networking chat using wxWidget and sockets. The main obejctive is to provide the user an GUI interface for chating with someoneelse in
-the same network. Future develpments will extend it to be used with clients in different networks.
+This project is about a chat using wxWidget and sockets. The main obejctive is to provide to the user an GUI interface for chating with someoneelse in
+the same network. Future developments will extend it to be used with clients in different networks.
 
 
 ## Dependencies for Running Locally
